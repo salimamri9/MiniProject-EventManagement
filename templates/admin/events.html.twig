@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Manage Events{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1>Events</h1>
+            <p>{{ events|length }} total events</p>
+        </div>
+        <a href="{{ path('admin_event_create') }}" class="btn btn-primary">+ New Event</a>
+    </div>
+
+    {% if events is empty %}
+        <div class="card text-center">
+            <p style="color: var(--text-muted);">No events yet.</p>
+            <a href="{{ path('admin_event_create') }}" class="btn btn-primary mt-2">Create First Event</a>
+        </div>
+    {% else %}
+        <div class="card" style="padding: 0; overflow: hidden;">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Event</th>
+                        <th>Date</th>
+                        <th>Seats</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in events %}
+                        <tr>
+                            <td>
+                                <strong>{{ event.title }}</strong><br>
+                                <span style="font-size: 0.85rem; color: var(--text-muted);">{{ event.location }}</span>
+                            </td>
+                            <td>{{ event.date|date('M j, Y') }}</td>
+                            <td>{{ event.availableSeats }}/{{ event.seats }}</td>
+                            <td>
+                                {% if event.availableSeats == 0 %}
+                                    <span class="badge badge-error">Sold Out</span>
+                                {% elseif event.availableSeats < 10 %}
+                                    <span class="badge badge-warning">Low</span>
+                                {% else %}
+                                    <span class="badge badge-success">Available</span>
+                                {% endif %}
+                            </td>
+                            <td style="text-align: right;">
+                                <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                                    <a href="{{ path('event_detail', {id: event.id}) }}" class="btn btn-secondary btn-sm">View</a>
+                                    <a href="{{ path('admin_event_edit', {id: event.id}) }}" class="btn btn-primary btn-sm">Edit</a>
+                                    <form method="post" action="{{ path('admin_event_delete', {id: event.id}) }}" onsubmit="return confirm('Delete this event?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('event_delete_' ~ event.id) }}">
+                                        <button type="submit" class="btn btn-error btn-sm">Delete</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

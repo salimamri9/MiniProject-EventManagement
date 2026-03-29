@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ action }} Event{% endblock %}
+
+{% block body %}
+<div class="container" style="max-width: 600px;">
+    <div class="page-header">
+        <h1>{{ action }} Event</h1>
+    </div>
+
+    <div class="card">
+        <form method="post">
+            <div class="form-group">
+                <label class="form-label">Title</label>
+                <input type="text" name="title" class="form-control" value="{{ event ? event.title : '' }}" placeholder="Event name" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea name="description" class="form-control" rows="4" placeholder="What's this event about?" required>{{ event ? event.description : '' }}</textarea>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label class="form-label">Date & Time</label>
+                    <input type="datetime-local" name="date" class="form-control" value="{{ event ? event.date|date('Y-m-d\\TH:i') : '' }}" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Seats</label>
+                    <input type="number" name="seats" class="form-control" value="{{ event ? event.seats : '' }}" min="1" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Location</label>
+                <input type="text" name="location" class="form-control" value="{{ event ? event.location : '' }}" placeholder="Venue address" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Image URL (optional)</label>
+                <input type="url" name="image" class="form-control" value="{{ event ? event.image : '' }}" placeholder="https://...">
+            </div>
+
+            <input type="hidden" name="_token" value="{{ csrf_token(action == 'Create' ? 'event_create' : 'event_edit') }}">
+
+            <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+                <button type="submit" class="btn btn-primary">{{ action }} Event</button>
+                <a href="{{ path('admin_events') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

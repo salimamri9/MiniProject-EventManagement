@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Reservations{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="page-header">
+        <h1>Reservations</h1>
+        <p>{{ reservations|length }} total bookings</p>
+    </div>
+
+    {% if reservations is empty %}
+        <div class="card text-center">
+            <p style="color: var(--text-muted);">No reservations yet.</p>
+        </div>
+    {% else %}
+        <div class="card" style="padding: 0; overflow: hidden;">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Event</th>
+                        <th>Guest</th>
+                        <th>Contact</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in reservations %}
+                        <tr>
+                            <td>
+                                <strong>{{ r.event.title }}</strong><br>
+                                <span style="font-size: 0.85rem; color: var(--text-muted);">{{ r.event.date|date('M j') }}</span>
+                            </td>
+                            <td>{{ r.fullName }}</td>
+                            <td>
+                                {{ r.email }}<br>
+                                <span style="font-size: 0.85rem; color: var(--text-muted);">{{ r.phone }}</span>
+                            </td>
+                            <td>
+                                {% if r.status == 'confirmed' %}
+                                    <span class="badge badge-success">Confirmed</span>
+                                {% elseif r.status == 'pending' %}
+                                    <span class="badge badge-warning">Pending</span>
+                                {% else %}
+                                    <span class="badge badge-error">Cancelled</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <form method="post" action="{{ path('admin_reservation_status', {id: r.id}) }}" style="display: flex; gap: 0.5rem;">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('reservation_status_' ~ r.id) }}">
+                                    <select name="status" class="form-control" style="width: auto; padding: 0.3rem 0.5rem; font-size: 0.85rem;">
+                                        <option value="pending" {{ r.status == 'pending' ? 'selected' : '' }}>Pending</option>
+                                        <option value="confirmed" {{ r.status == 'confirmed' ? 'selected' : '' }}>Confirmed</option>
+                                        <option value="cancelled" {{ r.status == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

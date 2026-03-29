@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="page-header">
+        <h1>Dashboard</h1>
+        <p>Welcome back, {{ app.user.username }}</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.totalEvents }}</div>
+            <div class="stat-label">Total Events</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.totalReservations }}</div>
+            <div class="stat-label">Reservations</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.totalUsers }}</div>
+            <div class="stat-label">Users</div>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+        <a href="{{ path('admin_events') }}" class="card" style="text-decoration: none; color: inherit;">
+            <h3 style="margin-bottom: 0.5rem;">Manage Events</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Create, edit, and delete events</p>
+        </a>
+        <a href="{{ path('admin_reservations') }}" class="card" style="text-decoration: none; color: inherit;">
+            <h3 style="margin-bottom: 0.5rem;">Reservations</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">View and manage bookings</p>
+        </a>
+    </div>
+</div>
+{% endblock %}
