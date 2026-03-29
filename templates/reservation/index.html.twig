@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My Bookings{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="page-header">
+        <h1>My Bookings</h1>
+        <p>Your event reservations</p>
+    </div>
+
+    {% if reservations is empty %}
+        <div class="card text-center">
+            <p style="color: var(--text-muted); margin-bottom: 1rem;">You haven't made any reservations yet.</p>
+            <a href="{{ path('event_list') }}" class="btn btn-primary">Browse Events</a>
+        </div>
+    {% else %}
+        <div class="card" style="padding: 0; overflow: hidden;">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Event</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in reservations %}
+                        <tr>
+                            <td>
+                                <strong>{{ r.event.title }}</strong><br>
+                                <span style="font-size: 0.85rem; color: var(--text-muted);">{{ r.event.location }}</span>
+                            </td>
+                            <td>{{ r.event.date|date('M j, Y') }}</td>
+                            <td>
+                                {% if r.status == 'confirmed' %}
+                                    <span class="badge badge-success">Confirmed</span>
+                                {% elseif r.status == 'pending' %}
+                                    <span class="badge badge-warning">Pending</span>
+                                {% else %}
+                                    <span class="badge badge-error">Cancelled</span>
+                                {% endif %}
+                            </td>
+                            <td style="text-align: right;">
+                                {% if r.status != 'cancelled' %}
+                                    <form method="post" action="{{ path('reservation_cancel', {id: r.id}) }}" onsubmit="return confirm('Cancel this reservation?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('reservation_cancel_' ~ r.id) }}">
+                                        <button type="submit" class="btn btn-error btn-sm">Cancel</button>
+                                    </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

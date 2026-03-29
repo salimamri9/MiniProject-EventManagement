@@ -1,0 +1,99 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ event.title }}{% endblock %}
+
+{% block body %}
+<div class="container" style="max-width: 800px;">
+    <div class="card" style="padding: 0; overflow: hidden;">
+        <div style="background: linear-gradient(135deg, #1e3a2f 0%, #0f1f1a 100%); padding: 2.5rem; text-align: center;">
+            <h1 style="font-size: 1.5rem; margin-bottom: 1rem;">{{ event.title }}</h1>
+            <div style="display: flex; justify-content: center; gap: 2rem; color: var(--text-muted); font-size: 0.9rem;">
+                <span>{{ event.date|date('M j, Y • g:i A') }}</span>
+                <span>{{ event.location }}</span>
+            </div>
+        </div>
+        
+        
+        <div style="padding: 1.5rem;">
+            <div style="margin-bottom: 1.5rem;">
+                {% set available = event.availableSeats %}
+                {% if available == 0 %}
+                    <span class="badge badge-error">Sold Out</span>
+                {% elseif available < 10 %}
+                    <span class="badge badge-warning">{{ available }} of {{ event.seats }} seats left</span>
+                {% else %}
+                    <span class="badge badge-success">{{ available }} of {{ event.seats }} seats available</span>
+                {% endif %}
+            </div>
+
+            <h3 style="font-size: 1rem; margin-bottom: 0.75rem; color: var(--text-muted);">About</h3>
+            <p style="margin-bottom: 1.5rem; line-height: 1.7;">{{ event.description }}</p>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 1rem; background: var(--bg-input); border-radius: var(--radius); margin-bottom: 1.5rem;">
+                <div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Capacity</div>
+                    <div style="font-weight: 500;">{{ event.seats }} people</div>
+                </div>
+                <div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Organizer</div>
+                    <div style="font-weight: 500;">{{ event.creator.username }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Admin Actions #}
+    {% if is_granted('ROLE_ADMIN') %}
+        <div class="card">
+            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                <a href="{{ path('admin_event_edit', {id: event.id}) }}" class="btn btn-primary">Edit Event</a>
+                <a href="{{ path('admin_events') }}" class="btn btn-secondary">← All Events</a>
+                <form method="post" action="{{ path('admin_event_delete', {id: event.id}) }}" style="display: inline;" onsubmit="return confirm('Delete this event?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('event_delete_' ~ event.id) }}">
+                    <button type="submit" class="btn btn-error">Delete</button>
+                </form>
+            </div>
+        </div>
+
+    {# User Reservation #}
+    {% elseif event.availableSeats > 0 %}
+        <div class="card">
+            <div class="card-header">
+                <h2>Reserve Your Spot</h2>
+            </div>
+
+            {% if app.user %}
+                <form method="post" action="{{ path('reservation_create', {eventId: event.id}) }}">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" name="fullName" class="form-control" value="{{ app.user.username }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" class="form-control" value="{{ app.user.email }}" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" name="phone" class="form-control" placeholder="+216 XX XXX XXX" required>
+                    </div>
+                    <input type="hidden" name="_token" value="{{ csrf_token('reservation') }}">
+                    <div style="display: flex; gap: 0.75rem;">
+                        <button type="submit" class="btn btn-primary">Confirm Reservation</button>
+                        <a href="{{ path('event_list') }}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            {% else %}
+                <div class="alert alert-warning">
+                    <a href="{{ path('auth_login') }}">Sign in</a> or <a href="{{ path('auth_register') }}">create an account</a> to reserve.
+                </div>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="card">
+            <div class="alert alert-error" style="margin: 0;">This event is sold out.</div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
