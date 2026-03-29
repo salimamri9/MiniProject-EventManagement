@@ -1,0 +1,163 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sign In{% endblock %}
+
+{% block body %}
+<div class="container" style="max-width: 420px; margin-top: 3rem;">
+    <div class="card">
+        <h2 style="text-align: center; margin-bottom: 0.5rem;">Welcome back</h2>
+        <p style="text-align: center; color: var(--text-muted); margin-bottom: 1.5rem;">Sign in to your account</p>
+
+        <div id="status-message"></div>
+
+        <!-- Auth method tabs -->
+        <div class="auth-tabs" style="display: flex; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border);">
+            <button type="button" class="auth-tab active" data-method="passkey" style="flex: 1; padding: 0.75rem; background: transparent; border: none; color: var(--text); cursor: pointer; border-bottom: 2px solid var(--accent);">🔐 Passkey</button>
+            <button type="button" class="auth-tab" data-method="password" style="flex: 1; padding: 0.75rem; background: transparent; border: none; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent;">🔑 Password</button>
+        </div>
+
+        <!-- Passkey login form -->
+        <form id="passkey-form" class="auth-form">
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" id="pk-email" class="form-control" placeholder="you@example.com" required autofocus>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
+                Use your registered passkey to sign in securely.
+            </p>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Sign In with Passkey</button>
+        </form>
+
+        <!-- Password login form (hidden by default) -->
+        <form id="password-form" class="auth-form" style="display: none;">
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" id="pw-email" class="form-control" placeholder="you@example.com" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" id="pw-password" class="form-control" placeholder="Your password" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Sign In</button>
+        </form>
+
+        <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">
+            <p style="color: var(--text-muted); font-size: 0.9rem;">
+                No account? <a href="{{ path('auth_register') }}">Create one</a>
+            </p>
+            <p style="margin-top: 0.5rem;">
+                <a href="{{ path('admin_login') }}" style="font-size: 0.85rem; color: var(--text-muted);">Admin access →</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script src="/js/webauthn.js"></script>
+<script>
+// Tab switching
+document.querySelectorAll('.auth-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        document.querySelectorAll('.auth-tab').forEach(t => {
+            t.classList.remove('active');
+            t.style.borderBottomColor = 'transparent';
+            t.style.color = 'var(--text-muted)';
+        });
+        this.classList.add('active');
+        this.style.borderBottomColor = 'var(--accent)';
+        this.style.color = 'var(--text)';
+        
+        const method = this.dataset.method;
+        document.getElementById('passkey-form').style.display = method === 'passkey' ? 'block' : 'none';
+        document.getElementById('password-form').style.display = method === 'password' ? 'block' : 'none';
+    });
+});
+
+// Passkey login
+document.getElementById('passkey-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const statusDiv = document.getElementById('status-message');
+    const button = this.querySelector('button[type="submit"]');
+    
+    const email = document.getElementById('pk-email').value.trim();
+    
+    button.disabled = true;
+    button.textContent = 'Authenticating...';
+    statusDiv.innerHTML = '<div class="alert alert-info">Requesting passkey...</div>';
+    
+    try {
+        // Step 1: Get login options
+        const optionsRes = await fetch('/api/auth/passkey/login/options', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+        const optionsData = await optionsRes.json();
+        
+        if (!optionsRes.ok) throw new Error(optionsData.error || 'Failed to get options');
+        
+        // Step 2: Get credential with WebAuthn
+        statusDiv.innerHTML = '<div class="alert alert-info">Complete the passkey prompt on your device...</div>';
+        const credential = await getCredential(optionsData);
+        
+        // Step 3: Verify with server
+        statusDiv.innerHTML = '<div class="alert alert-info">Verifying...</div>';
+        const verifyRes = await fetch('/api/auth/passkey/login/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, credential })
+        });
+        const verifyData = await verifyRes.json();
+        
+        if (!verifyRes.ok) throw new Error(verifyData.error || 'Login failed');
+        
+        statusDiv.innerHTML = '<div class="alert alert-success">Welcome back! Redirecting...</div>';
+        setTimeout(() => window.location.href = verifyData.redirect || '/', 1000);
+        
+    } catch (error) {
+        button.disabled = false;
+        button.textContent = 'Sign In with Passkey';
+        
+        if (error.name === 'NotAllowedError') {
+            statusDiv.innerHTML = '<div class="alert alert-error">Passkey authentication cancelled. Try the Password method.</div>';
+        } else {
+            statusDiv.innerHTML = '<div class="alert alert-error">' + error.message + '</div>';
+        }
+    }
+});
+
+// Password login
+document.getElementById('password-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const statusDiv = document.getElementById('status-message');
+    const button = this.querySelector('button[type="submit"]');
+    
+    const email = document.getElementById('pw-email').value.trim();
+    const password = document.getElementById('pw-password').value;
+    
+    button.disabled = true;
+    button.textContent = 'Signing in...';
+    statusDiv.innerHTML = '<div class="alert alert-info">Signing in...</div>';
+    
+    try {
+        const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        const data = await response.json();
+        
+        if (!response.ok) throw new Error(data.error || 'Login failed');
+        
+        statusDiv.innerHTML = '<div class="alert alert-success">Welcome back! Redirecting...</div>';
+        setTimeout(() => window.location.href = data.redirect || '/', 1000);
+        
+    } catch (error) {
+        button.disabled = false;
+        button.textContent = 'Sign In';
+        statusDiv.innerHTML = '<div class="alert alert-error">' + error.message + '</div>';
+    }
+});
+</script>
+{% endblock %}
