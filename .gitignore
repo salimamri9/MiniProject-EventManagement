@@ -6,9 +6,11 @@
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
 .editorconfig
+/.vscode/
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
+.env
 .env.*
 
 ###> lexik/jwt-authentication-bundle ###
