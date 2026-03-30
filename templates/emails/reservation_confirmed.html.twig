@@ -4,29 +4,24 @@
     <meta charset="UTF-8">
     <title>Reservation Confirmed</title>
 </head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-    <div style="background-color: #f8f9fa; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
-        <h2 style="color: #0056b3; margin: 0;">Reservation Confirmed! 🎉</h2>
-    </div>
-    
-    <div style="padding: 20px; border: 1px solid #ddd; border-top: none; border-radius: 0 0 8px 8px;">
-        <p>Hi <strong>{{ user.username }}</strong>,</p>
-        
-        <p>Great news! Your reservation for the event has been confirmed by the administration.</p>
-        
-        <div style="background-color: #e9ecef; padding: 15px; border-radius: 5px; margin: 20px 0;">
-            <h3 style="margin-top: 0; color: #495057;">Event Details:</h3>
-            <ul style="list-style-type: none; padding: 0; margin: 0;">
-                <li style="margin-bottom: 10px;"><strong>📅 Event:</strong> {{ event.title }}</li>
-                <li style="margin-bottom: 10px;"><strong>⏰ Date:</strong> {{ event.date|date('F j, Y, g:i a') }}</li>
-                <li style="margin-bottom: 10px;"><strong>📍 Location:</strong> {{ event.location }}</li>
-                <li><strong>🎟️ Seats Reserved:</strong> {{ reservation.seats }}</li>
-            </ul>
+<body style="font-family: Arial, sans-serif; line-height: 1.5; color: #222; background: #f7f7f7; padding: 24px;">
+    <div style="max-width: 620px; margin: 0 auto; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+        <div style="background: #16a34a; color: #fff; padding: 16px 20px;">
+            <h2 style="margin: 0; font-size: 20px;">Reservation confirmed</h2>
         </div>
-        
-        <p>If you have any questions, feel free to contact us.</p>
-        
-        <p style="margin-top: 30px;">Best regards,<br><strong>The Events Management Team</strong></p>
+
+        <div style="padding: 20px;">
+            <p style="margin-top: 0;">Hello {{ reservation.fullName }},</p>
+            <p>Your reservation has been confirmed by the admin team.</p>
+
+            <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; padding: 14px; margin: 16px 0;">
+                <p style="margin: 0 0 8px;"><strong>Event:</strong> {{ event.title }}</p>
+                <p style="margin: 0 0 8px;"><strong>Date:</strong> {{ event.date|date('F j, Y \a\t g:i A') }}</p>
+                <p style="margin: 0;"><strong>Location:</strong> {{ event.location }}</p>
+            </div>
+
+            <p style="margin-bottom: 0;">Thanks,<br>Events Management Team</p>
+        </div>
     </div>
 </body>
 </html>

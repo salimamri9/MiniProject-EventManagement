@@ -7,7 +7,8 @@ RUN apt-get update && apt-get install -y \
     unzip \
     git \
     && docker-php-ext-install pdo pdo_pgsql zip \
-    && a2enmod rewrite
+    && a2enmod rewrite \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -18,7 +19,7 @@ WORKDIR /var/www/html
 # Copy composer files first for better caching
 COPY composer.json composer.lock ./
 
-# Install dependencies (always, not just if vendor missing)
+# Install dependencies
 RUN composer install --no-dev --optimize-autoloader --no-scripts
 
 # Copy application
@@ -43,6 +44,11 @@ RUN echo '<VirtualHost *:80>\n\
     </Directory>\n\
 </VirtualHost>' > /etc/apache2/sites-available/000-default.conf
 
+# Copy and set up entrypoint script
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 EXPOSE 80
 
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["apache2-foreground"]

@@ -26,18 +26,18 @@ final class Version20260329045400 extends AbstractMigration
         )');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_ADMIN_USERNAME ON admin (username)');
 
-        // User table
-        $this->addSql('CREATE TABLE user (
+        // User table (quoted because "user" is a reserved word in PostgreSQL)
+        $this->addSql('CREATE TABLE "user" (
             id CHAR(36) NOT NULL PRIMARY KEY,
             username VARCHAR(180) NOT NULL UNIQUE,
             email VARCHAR(180) NOT NULL UNIQUE,
-            password VARCHAR(255) DEFAULT NULL,
+            password_hash VARCHAR(255) DEFAULT NULL,
             roles TEXT NOT NULL,
             created_at TIMESTAMP NOT NULL,
             updated_at TIMESTAMP NOT NULL
         )');
-        $this->addSql('CREATE UNIQUE INDEX UNIQ_USER_USERNAME ON user (username)');
-        $this->addSql('CREATE UNIQUE INDEX UNIQ_USER_EMAIL ON user (email)');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_USER_USERNAME ON "user" (username)');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_USER_EMAIL ON "user" (email)');
 
         // Event table
         $this->addSql('CREATE TABLE event (
@@ -68,7 +68,7 @@ final class Version20260329045400 extends AbstractMigration
             created_at TIMESTAMP NOT NULL,
             confirmed_at TIMESTAMP DEFAULT NULL,
             FOREIGN KEY (event_id) REFERENCES event(id) ON DELETE CASCADE,
-            FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
+            FOREIGN KEY (user_id) REFERENCES "user"(id) ON DELETE CASCADE
         )');
         $this->addSql('CREATE INDEX IDX_RESERVATION_EVENT ON reservation (event_id)');
         $this->addSql('CREATE INDEX IDX_RESERVATION_USER ON reservation (user_id)');
@@ -83,14 +83,14 @@ final class Version20260329045400 extends AbstractMigration
             name VARCHAR(255) NOT NULL,
             created_at TIMESTAMP NOT NULL,
             last_used_at TIMESTAMP NOT NULL,
-            FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
+            FOREIGN KEY (user_id) REFERENCES "user"(id) ON DELETE CASCADE
         )');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_CREDENTIAL_ID ON webauthn_credential (public_key_credential_id)');
         $this->addSql('CREATE INDEX IDX_WEBAUTHN_USER ON webauthn_credential (user_id)');
 
-        // RefreshToken table (already exists in entity but adding for completeness)
-        $this->addSql('CREATE TABLE IF NOT EXISTS refresh_token (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+        // RefreshToken table for JWT
+        $this->addSql('CREATE TABLE refresh_token (
+            id SERIAL PRIMARY KEY,
             refresh_token VARCHAR(128) NOT NULL UNIQUE,
             username VARCHAR(255) NOT NULL,
             valid TIMESTAMP NOT NULL

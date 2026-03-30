@@ -1,0 +1,38 @@
+# Git
+.git
+.gitignore
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Environment files (use compose env vars instead)
+.env.local
+.env.*.local
+.env.test
+
+# Symfony cache/logs (recreated at runtime)
+/var/cache/
+/var/log/
+
+# Tests
+/tests/
+/.phpunit.cache/
+phpunit.xml
+phpunit.dist.xml
+
+# Docker files (don't need to copy these into the image)
+Dockerfile
+compose.yaml
+compose.override.yaml
+docker-compose*.yml
+.dockerignore
+
+# Documentation
+*.md
+LICENSE
+
+# Development tools
+.editorconfig

@@ -5,9 +5,11 @@
 /.env.*.local
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
+.editorconfig
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
+.env.*
 
 ###> lexik/jwt-authentication-bundle ###
 /config/jwt/*.pem

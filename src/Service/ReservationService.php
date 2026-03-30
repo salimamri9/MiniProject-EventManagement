@@ -15,6 +15,7 @@ class ReservationService
     public function __construct(
         private ReservationRepository $reservationRepository,
         private EventRepository $eventRepository,
+        private ReservationNotificationService $reservationNotificationService,
         private EntityManagerInterface $entityManager
     ) {
     }
@@ -77,8 +78,14 @@ class ReservationService
             throw new \RuntimeException('Reservation not found');
         }
 
+        $wasConfirmed = $reservation->isConfirmed();
         $reservation->confirm();
         $this->reservationRepository->save($reservation, true);
+
+        if (!$wasConfirmed) {
+            $this->reservationNotificationService->sendReservationConfirmedEmail($reservation);
+        }
+
         return $reservation;
     }
 

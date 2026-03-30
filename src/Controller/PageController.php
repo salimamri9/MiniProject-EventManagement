@@ -7,6 +7,7 @@ use App\Repository\EventRepository;
 use App\Repository\ReservationRepository;
 use App\Repository\UserRepository;
 use App\Repository\AdminRepository;
+use App\Service\ReservationNotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\DBAL\LockMode;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,6 +23,7 @@ class PageController extends AbstractController
         private ReservationRepository $reservationRepository,
         private UserRepository $userRepository,
         private AdminRepository $adminRepository,
+        private ReservationNotificationService $reservationNotificationService,
         private EntityManagerInterface $em
     ) {}
 
@@ -445,12 +447,26 @@ class PageController extends AbstractController
             return $this->redirectToRoute('admin_reservations');
         }
 
+        $previousStatus = $reservation->getStatus();
         $newStatus = $request->request->get('status');
         if (in_array($newStatus, ['pending', 'confirmed', 'cancelled'])) {
             $reservation->setStatus($newStatus);
             $reservation->setUpdatedAt(new \DateTimeImmutable());
             $this->em->flush();
-            $this->addFlash('success', 'Reservation status updated!');
+
+            if ($previousStatus !== 'confirmed' && $newStatus === 'confirmed') {
+                $emailSent = $this->reservationNotificationService->sendReservationConfirmedEmail($reservation);
+
+                if ($emailSent) {
+                    $this->addFlash('success', 'Reservation confirmed and email sent to the user.');
+                } else {
+                    $this->addFlash('warning', 'Reservation confirmed, but email could not be sent.');
+                }
+            } else {
+                $this->addFlash('success', 'Reservation status updated!');
+            }
+        } else {
+            $this->addFlash('error', 'Invalid reservation status.');
         }
 
         return $this->redirectToRoute('admin_reservations');
