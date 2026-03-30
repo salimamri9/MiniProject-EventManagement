@@ -1,4 +1,4 @@
-# Event Management App
+# Noevent
 
 A Symfony 7.4 web application to manage events and reservations, with separate user/admin flows, JWT support for APIs, and passkey-ready authentication components.
 

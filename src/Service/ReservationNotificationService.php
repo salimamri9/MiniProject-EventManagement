@@ -23,7 +23,7 @@ class ReservationNotificationService
     {
         try {
             $email = (new TemplatedEmail())
-                ->from(new Address($this->fromAddress, 'Events Management'))
+                ->from(new Address($this->fromAddress, 'Noevent'))
                 ->to($reservation->getEmail())
                 ->subject('Your reservation is confirmed')
                 ->htmlTemplate('emails/reservation_confirmed.html.twig')

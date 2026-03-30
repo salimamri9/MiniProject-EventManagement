@@ -20,7 +20,7 @@ class PasskeyAuthService
         private WebauthnCredentialRepository $credentialRepository
     ) {
         $this->rpId = $_ENV['RELYING_PARTY_ID'] ?? 'localhost';
-        $this->rpName = $_ENV['RELYING_PARTY_NAME'] ?? 'EventHub';
+        $this->rpName = $_ENV['RELYING_PARTY_NAME'] ?? 'Noevent';
     }
 
     /**

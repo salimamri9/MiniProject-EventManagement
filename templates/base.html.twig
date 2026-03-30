@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Events{% endblock %}</title>
+    <title>{% block title %}Noevent{% endblock %}</title>
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
 </head>
 <body>
     <nav class="navbar">
         <div class="container">
             <div class="nav-brand">
-                <a href="{{ path('event_list') }}">EventHub</a>
+                <a href="{{ path('event_list') }}">Noevent</a>
             </div>
             <div class="nav-menu">
                 {% if app.user %}
@@ -44,7 +44,7 @@
     </main>
 
     <footer class="footer">
-        <div class="container">EventHub © {{ 'now'|date('Y') }}</div>
+        <div class="container">Noevent © {{ 'now'|date('Y') }}</div>
     </footer>
 
     {% block javascripts %}{% endblock %}

@@ -1,6 +1,6 @@
 services:
   # PHP/Symfony Application
-  app:
+  Noevent:
     build:
       context: .
       dockerfile: Dockerfile
