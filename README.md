@@ -20,7 +20,7 @@ A Symfony 7.4 web application to manage events and reservations, with separate u
 - **ORM:** Doctrine ORM + Doctrine Migrations
 - **Auth:** Symfony Security + Lexik JWT + Gesdinet Refresh Token
 - **Templates/UI:** Twig + custom CSS/JS
-- **Email:** Symfony Mailer (Mailpit/Mailhog-compatible SMTP)
+- **Email:** Symfony Mailer (Mailpit SMTP)
 - **Testing:** PHPUnit 11
 - **Containerization:** Docker Compose
 
@@ -77,4 +77,4 @@ docker exec app-noevent-1 php bin/console cache:clear
 ## Notes
 
 - Confirmation emails are sent when an admin changes a reservation status to `confirmed`.
-- For local development, emails are captured by Mailpit (no real email delivery).
+- For local development, emails are captured by Mailpit (no real email delivery), check http://localhost:8025 .
