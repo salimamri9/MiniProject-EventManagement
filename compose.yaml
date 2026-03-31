@@ -1,15 +1,26 @@
 services:
   # PHP/Symfony Application
-  Noevent:
+  noevent:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
       - "8088:80"
     environment:
+      APP_RUNTIME_OPTIONS: '{"disable_dotenv":true}'
       APP_ENV: dev
+      APP_SHARE_DIR: var/share
+      DEFAULT_URI: http://localhost:8088
       APP_SECRET: b269ae8881e4332ec4f32f25934e4ba0
-      DATABASE_URL: postgresql://app:password@database:5432/events_management?serverVersion=16&charset=utf8
+      CORS_ALLOW_ORIGIN: '^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$'
+      JWT_SECRET_KEY: /var/www/html/config/jwt/private.pem
+      JWT_PUBLIC_KEY: /var/www/html/config/jwt/public.pem
+      JWT_PASSPHRASE: fc261ffbb84b30cac879595f8c82de1908c0e1e77eae98237810fef88e7b209b
+      RELYING_PARTY_ID: localhost
+      RELYING_PARTY_NAME: Noevent
+      ADMIN_SEED_USERNAME: admin
+      ADMIN_SEED_PASSWORD: admin12345
+      DATABASE_URL: postgresql://postgres:password@database:5432/events_management?serverVersion=16&charset=utf8
       MAILER_DSN: smtp://mailer:1025
       MAILER_FROM: noreply@localhost
     depends_on:
@@ -27,9 +38,9 @@ services:
     environment:
       POSTGRES_DB: events_management
       POSTGRES_PASSWORD: password
-      POSTGRES_USER: app
+      POSTGRES_USER: postgres
     healthcheck:
-      test: ["CMD", "pg_isready", "-d", "events_management", "-U", "app"]
+      test: ["CMD", "pg_isready", "-d", "events_management", "-U", "postgres"]
       timeout: 5s
       retries: 5
       start_period: 60s

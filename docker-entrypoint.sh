@@ -20,6 +20,10 @@ echo "Database connection ready!"
 echo "Running database migrations..."
 php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration || true
 
+# Seed initial data (idempotent)
+echo "Seeding initial data..."
+php bin/console app:seed-initial-data --no-interaction || true
+
 # Clear and warm up cache
 echo "Warming up cache..."
 php bin/console cache:clear --no-warmup || true

@@ -35,59 +35,43 @@ A Symfony 7.4 web application to manage events and reservations, with separate u
 
 ## How to Start the Project
 
-### 1) Install dependencies
+The application is fully containerized. You do not need to install PHP or Composer locally.
+
+### 1) Start the Application
 
 ```bash
-composer install
+docker compose up --build -d
 ```
 
-### 2) Start infrastructure (PostgreSQL + Mailpit)
+This will automatically:
+- Start the application on http://localhost:8088
+- Boot the PostgreSQL database
+- Run all database migrations
+- Seed initial data (Admin user and demo events)
+- Start Mailpit for catching local emails on http://localhost:8025
 
-```bash
-docker compose up -d
-```
+### 2) Default Seeded Credentials
 
-Mailpit UI: http://localhost:8025  
-SMTP host used by app: `mailer:1025`
+Because new admin accounts cannot be created from the UI, the application automatically seeds a default admin account on the very first startup:
 
-### 3) Configure environment
+- **Admin Login URL:** http://localhost:8088/admin/login
+- **Username:** `admin`
+- **Password:** `admin12345`
 
-Default values are in `.env`.
-
-Main variables:
-- `DATABASE_URL`
-- `MAILER_DSN`
-- `MAILER_FROM`
-- `APP_SECRET`
-
-### 4) Run database migrations
-
-```bash
-php bin/console doctrine:migrations:migrate -n
-```
-
-### 5) Run the app
-
-Use PHP built-in server:
-
-```bash
-php -S 127.0.0.1:8000 -t public
-```
-
-Then open: http://127.0.0.1:8000
+*(You can change these default seed values in `compose.yaml` under the environment variables `ADMIN_SEED_USERNAME` and `ADMIN_SEED_PASSWORD`)*
 
 ## Useful Commands
 
-Run tests:
+Run tests (inside the container):
 
 ```bash
-php bin/phpunit
+docker exec app-noevent-1 bin/phpunit
 ```
 
-Clear cache:
+Clear cache (inside the container):
 
 ```bash
-php bin/console cache:clear
+docker exec app-noevent-1 php bin/console cache:clear
 ```
 
 ## Notes
