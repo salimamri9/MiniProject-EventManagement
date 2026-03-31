@@ -22,7 +22,7 @@ function bufferToBase64url(buffer) {
     return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 }
 
-export async function createCredential(options) {
+async function createCredential(options) {
     console.log('createCredential called with options:', JSON.stringify(options, null, 2));
     
     // Convert challenge and user ID from base64url to ArrayBuffer
@@ -61,7 +61,7 @@ export async function createCredential(options) {
     return result;
 }
 
-export async function getCredential(options) {
+async function getCredential(options) {
     console.log('getCredential called with options:', JSON.stringify(options, null, 2));
     
     // Convert challenge from base64url to ArrayBuffer
@@ -101,12 +101,12 @@ export async function getCredential(options) {
     return result;
 }
 
-export function isWebAuthnSupported() {
+function isWebAuthnSupported() {
     return window.PublicKeyCredential !== undefined;
 }
 
 // Check if platform authenticator is available
-export async function isPlatformAuthenticatorAvailable() {
+async function isPlatformAuthenticatorAvailable() {
     if (!isWebAuthnSupported()) return false;
     try {
         return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();

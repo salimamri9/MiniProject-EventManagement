@@ -12,7 +12,6 @@ use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-#[ORM\UniqueConstraint(name: 'UNIQ_USER_USERNAME', columns: ['username'])]
 #[ORM\UniqueConstraint(name: 'UNIQ_USER_EMAIL', columns: ['email'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -20,7 +19,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'string', length: 36)]
     private string $id;
 
-    #[ORM\Column(length: 180, unique: true)]
+    #[ORM\Column(length: 180)]
     private string $username;
 
     #[ORM\Column(length: 180, unique: true)]

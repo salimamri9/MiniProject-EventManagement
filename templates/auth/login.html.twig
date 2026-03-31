@@ -56,6 +56,7 @@
 {% block javascripts %}
 <script src="/js/webauthn.js"></script>
 <script>
+document.addEventListener('DOMContentLoaded', function() {
 // Tab switching
 document.querySelectorAll('.auth-tab').forEach(tab => {
     tab.addEventListener('click', function() {
@@ -158,6 +159,7 @@ document.getElementById('password-form').addEventListener('submit', async functi
         button.textContent = 'Sign In';
         statusDiv.innerHTML = '<div class="alert alert-error">' + error.message + '</div>';
     }
+});
 });
 </script>
 {% endblock %}

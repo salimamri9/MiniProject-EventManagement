@@ -1,5 +1,3 @@
-import { getCredential, isWebAuthnSupported, isPlatformAuthenticatorAvailable } from './webauthn.js';
-
 const form = document.getElementById('login-form');
 const statusDiv = document.getElementById('status-message');
 
